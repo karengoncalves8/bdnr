@@ -1,145 +1,171 @@
 from bson import ObjectId
 from db import conectar_mongo
+from vendedor import mostrarTodosVendedores
 
 db = conectar_mongo()
 
+colecao_produto = db.produto
 colecao_vendedor = db.vendedor
-vendedores = list(colecao_vendedor.find({}))
 
-def mostrarTodosVendedores():
-    print("\nListagem de vendedores")
+def mostrarTodosProdutos():
+    print("\nListagem de Produtos")
+    produtos = list(colecao_produto.find({}))
 
-    for index, vendedor in enumerate(vendedores):
-        print(f'{index} - {vendedor['nome']}')
+    for index, produto in enumerate(produtos):
+        print(f'{index} - {produto['nome']}')
 
-def listarVendedorDict(vendedor_dict):
-    for key in vendedor_dict:
-        if(key == "endereco"): 
-            print(f"{key}: {vendedor_dict[key]["rua"]}, {vendedor_dict[key]["bairro"]}, {vendedor_dict[key]["cidade"]}, {vendedor_dict[key]["estado"]}, {vendedor_dict[key]["cep"]}")
+def listarProdutoDict(produto_dict):
+    for key in produto_dict:
+        if(key == "vendedor"): 
+            print("-- Informações do vendedor: ")
+            for vendedor_key in produto_dict["vendedor"]:
+                if(vendedor_key == "endereco"): 
+                    print(f"{vendedor_key}: {produto_dict["vendedor"][vendedor_key]["rua"]}, {produto_dict["vendedor"][vendedor_key]["bairro"]}, {produto_dict["vendedor"][vendedor_key]["cidade"]}, {produto_dict["vendedor"][vendedor_key]["estado"]}, {produto_dict["vendedor"][vendedor_key]["cep"]}")
+                    continue
+                print(f'{vendedor_key}: {produto_dict["vendedor"][vendedor_key]}')
             continue
-        print(f'{key}: {vendedor_dict[key]}')
+        print(f'{key}: {produto_dict[key]}')
 
-def criarVendedor():
-    print("\n======== Inserindo um novo vendedor ========")
+def criarProduto():
+    print("\n======== Inserindo um novo produto ========")
 
     nome = input("Nome: ")
-    dataNas = input("Data de Nascimento: ")
-    telefone = input("Telefone: ")
-    email = input("Email: ")
-    senha = input("Senha: ")
-    cnpj = input("CNPJ: ")
+    preco = float(input("Preço: "))
+    quantidade = int(input("Quantidade: "))
+    marca = input("Marca: ")
+    material = input("Material: ")
+    descricao = input("Descrição: ")
 
-    rua = input("Rua: ")
-    bairro = input("Bairro: ")
-    cidade = input("Cidade: ")
-    estado = input("Estado: ")
-    cep = input("Cep: ")
-
-    vendedor = {
-        "nome": nome,
-        "dataNascimento": dataNas,
-        "telefone": telefone,
-        "email": email,
-        "senha": senha,
-        "cnpj": cnpj,
-        "endereco": {
-            "rua": rua,
-            "bairro": bairro,
-            "cidade": cidade,
-            "estado": estado,
-            "cep": cep
-        }
-    }
-
-    doc = colecao_vendedor.insert_one(vendedor)
-    print("Documento inserido com ID ",doc.inserted_id)
-
-def editarVendedor():
-    print("\n======== Editar um vendedor ========")
+    print("Associe a um vendedor: ")
 
     mostrarTodosVendedores()
 
-    opcao = int(input("Index da opção escolhida: "))
+    opcao_vendedor = int(input("Index da opção escolhida: "))
+    vendedores = list(colecao_vendedor.find({}))
 
-    vendedor_escolhido = vendedores[opcao]
+    try:
+        vendedor_escolhido = vendedores[opcao_vendedor]
+    except IndexError:
+        print("Índice não encontrado! Por favor, escolha um índice válido.")
+        return
 
-    query_filter = {'_id': ObjectId(vendedor_escolhido['_id'])}
-
-    nome = input("Nome: ")
-    dataNas = input("Data de Nascimento: ")
-    telefone = input("Telefone: ")
-    email = input("Email: ")
-    senha = input("Senha: ")
-    cnpj = input("CNPJ: ")
-
-    rua = input("Rua: ")
-    bairro = input("Bairro: ")
-    cidade = input("Cidade: ")
-    estado = input("Estado: ")
-    cep = input("Cep: ")
-
-    vendedor = {
+    produto = {
         "nome": nome,
-        "dataNascimento": dataNas,
-        "telefone": telefone,
-        "email": email,
-        "senha": senha,
-        "cnpj": cnpj,
-        "endereco": {
-            "rua": rua,
-            "bairro": bairro,
-            "cidade": cidade,
-            "estado": estado,
-            "cep": cep
-        }
+        "preco": preco,
+        "quantidade": quantidade,
+        "marca": marca,
+        "material": material,
+        "descricao": descricao,
+        "vendedor": vendedor_escolhido
     }
 
-    update_operation = { '$set' : vendedor }
+    doc = colecao_produto.insert_one(produto)
+    print("Documento inserido com ID ",doc.inserted_id)
 
-    result = colecao_vendedor.update_one(query_filter, update_operation)
+def editarProduto():
+    print("\n======== Editar um produto ========")
+
+    mostrarTodosProdutos()
+
+    opcao = int(input("Index da opção escolhida: "))
+
+    produtos = list(colecao_produto.find({}))
+    try:
+        produto_escolhido = produtos[opcao]
+    except IndexError:
+        print("Índice não encontrado! Por favor, escolha um índice válido.")
+        return
+
+    query_filter = {'_id': ObjectId(produto_escolhido['_id'])}
+    
+    nome = input("Nome: ")
+    preco = float(input("Preço: "))
+    quantidade = int(input("Quantidade: "))
+    marca = input("Marca: ")
+    material = input("Material: ")
+    descricao = input("Descrição: ")
+
+    print("Associe a um vendedor: ")
+
+    mostrarTodosVendedores()
+
+    opcao_vendedor = int(input("Index da opção escolhida: "))
+    vendedores = list(colecao_vendedor.find({}))
+
+    try:
+        vendedor_escolhido = vendedores[opcao_vendedor]
+    except IndexError:
+        print("Índice não encontrado! Por favor, escolha um índice válido.")
+        return
+
+    produto = {
+        "nome": nome,
+        "preco": preco,
+        "quantidade": quantidade,
+        "marca": marca,
+        "material": material,
+        "descricao": descricao,
+        "vendedor": vendedor_escolhido
+    }
+
+    update_operation = { '$set' : produto }
+
+    result = colecao_produto.update_one(query_filter, update_operation)
 
     if result.modified_count > 0:
-        print("Vendedor atualizado com sucesso!")
+        print("Produto atualizado com sucesso!")
     else:
         print("Nenhuma alteração realizada. Verifique o ID ou os dados.")
 
-def deletarVendedor():
-    print("\n======== Remover um vendedor ========")
+def deletarProduto():
+    print("\n======== Remover um Produto ========")
 
-    mostrarTodosVendedores()
+    mostrarTodosProdutos()
 
     opcao = int(input("Index da opção escolhida: "))
 
-    vendedor_escolhido = vendedores[opcao]
+    produtos = list(colecao_produto.find({}))
+    try:
+        produto_escolhido = produtos[opcao]
+    except IndexError:
+        print("Índice não encontrado! Por favor, escolha um índice válido.")
+        return
 
-    query_filter = {'_id': ObjectId(vendedor_escolhido['_id'])}
+    query_filter = {'_id': ObjectId(produto_escolhido['_id'])}
 
-    result = colecao_vendedor.delete_one(query_filter)
+    result = colecao_produto.delete_one(query_filter)
 
     if result.deleted_count > 0:
-        print("Vendedor deletado com sucesso!")
+        print("Produto deletado com sucesso!")
     else:
         print("Nenhuma alteração realizada. Verifique o ID.")
 
-def listarVendedor():
-    print("\n======== Listar um vendedor ========")
+def listarProduto():
+    print("\n======== Listar um produto ========")
 
-    mostrarTodosVendedores()
+    mostrarTodosProdutos()
 
     opcao = int(input("Index da opção escolhida: "))
 
-    vendedor_escolhido = vendedores[opcao]
+    produtos = list(colecao_produto.find({}))
+    try:
+        produto_escolhido = produtos[opcao]
+    except IndexError:
+        print("Índice não encontrado! Por favor, escolha um índice válido.")
+        return
 
-    query_filter = {'_id': ObjectId(vendedor_escolhido['_id'])}
+    query_filter = {'_id': ObjectId(produto_escolhido['_id'])}
 
-    result = colecao_vendedor.find_one(query_filter)
+    result = colecao_produto.find_one(query_filter)
 
-    listarVendedorDict(result)
+    listarProdutoDict(result)
 
 
-def listarTodosVendedores():
-    print("\n======== Listar todos vendedores ========")
-    for vendedor in vendedores:
+def listarTodosProdutos():
+    print("\n======== Listar todos produtos ========")
+    produtos = list(colecao_produto.find({}))
+    
+    for produto in produtos:
         print("------------------------------------------------------")
-        listarVendedorDict(vendedor)
+        listarProdutoDict(produto)
 

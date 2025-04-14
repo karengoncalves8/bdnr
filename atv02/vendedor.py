@@ -4,10 +4,10 @@ from db import conectar_mongo
 db = conectar_mongo()
 
 colecao_vendedor = db.vendedor
-vendedores = list(colecao_vendedor.find({}))
 
 def mostrarTodosVendedores():
     print("\nListagem de vendedores")
+    vendedores = list(colecao_vendedor.find({}))
 
     for index, vendedor in enumerate(vendedores):
         print(f'{index} - {vendedor['nome']}')
@@ -61,7 +61,12 @@ def editarVendedor():
 
     opcao = int(input("Index da opção escolhida: "))
 
-    vendedor_escolhido = vendedores[opcao]
+    vendedores = list(colecao_vendedor.find({}))
+    try:
+        vendedor_escolhido = vendedores[opcao]
+    except IndexError:
+        print("Índice não encontrado! Por favor, escolha um índice válido.")
+        return
 
     query_filter = {'_id': ObjectId(vendedor_escolhido['_id'])}
 
@@ -110,7 +115,12 @@ def deletarVendedor():
 
     opcao = int(input("Index da opção escolhida: "))
 
-    vendedor_escolhido = vendedores[opcao]
+    vendedores = list(colecao_vendedor.find({}))
+    try:
+        vendedor_escolhido = vendedores[opcao]
+    except IndexError:
+        print("Índice não encontrado! Por favor, escolha um índice válido.")
+        return
 
     query_filter = {'_id': ObjectId(vendedor_escolhido['_id'])}
 
@@ -128,7 +138,12 @@ def listarVendedor():
 
     opcao = int(input("Index da opção escolhida: "))
 
-    vendedor_escolhido = vendedores[opcao]
+    vendedores = list(colecao_vendedor.find({}))
+    try:
+        vendedor_escolhido = vendedores[opcao]
+    except IndexError:
+        print("Índice não encontrado! Por favor, escolha um índice válido.")
+        return
 
     query_filter = {'_id': ObjectId(vendedor_escolhido['_id'])}
 
@@ -139,6 +154,8 @@ def listarVendedor():
 
 def listarTodosVendedores():
     print("\n======== Listar todos vendedores ========")
+    vendedores = list(colecao_vendedor.find({}))
+    
     for vendedor in vendedores:
         print("------------------------------------------------------")
         listarVendedorDict(vendedor)
