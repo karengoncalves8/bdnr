@@ -6,6 +6,22 @@ db = conectar_mongo()
 
 colecao_produto = db.produto
 colecao_vendedor = db.vendedor
+colecao_favorito = db.favoritos
+
+def atualizarFavorito(produto):
+    print("o produto escolhido", produto)
+    produto_att = colecao_produto.find_one({'_id': ObjectId(produto['_id'])})
+
+    # Atualizar informações do produto na lista de favoritos
+    query_filter = {'produto._id': produto['_id']}
+    update_operation = { '$set': {'produto': produto_att}}
+
+    result = colecao_favorito.update_many(query_filter, update_operation)
+
+    if result.modified_count > 0:
+        print(f"Produto atualizado na lista de favoritos com sucesso!")
+    else:
+        print("Nenhuma alteração nos produtos dos favoritos.")
 
 def mostrarTodosProdutos():
     print("\nListagem de Produtos")
@@ -79,8 +95,12 @@ def editarProduto():
     query_filter = {'_id': ObjectId(produto_escolhido['_id'])}
     
     nome = input("Nome: ")
-    preco = float(input("Preço: "))
-    quantidade = int(input("Quantidade: "))
+    preco = input("Preço: ")
+    if preco.strip():  
+        preco = float(preco)  
+    quantidade = input("Quantidade: ")
+    if quantidade.strip():  
+        quantidade = int(quantidade) 
     marca = input("Marca: ")
     material = input("Material: ")
     descricao = input("Descrição: ")
@@ -99,12 +119,12 @@ def editarProduto():
         return
 
     produto = {
-        "nome": nome,
-        "preco": preco,
-        "quantidade": quantidade,
-        "marca": marca,
-        "material": material,
-        "descricao": descricao,
+        "nome": nome if nome else produto_escolhido["nome"],
+        "preco": preco if preco else produto_escolhido["preco"],
+        "quantidade": quantidade if quantidade else produto_escolhido["quantidade"],
+        "marca": marca if marca else produto_escolhido["marca"],
+        "material": material if material else produto_escolhido["material"],
+        "descricao": descricao if descricao else produto_escolhido["descricao"],
         "vendedor": vendedor_escolhido
     }
 
@@ -114,6 +134,7 @@ def editarProduto():
 
     if result.modified_count > 0:
         print("Produto atualizado com sucesso!")
+        atualizarFavorito(produto_escolhido)
     else:
         print("Nenhuma alteração realizada. Verifique o ID ou os dados.")
 
@@ -137,6 +158,13 @@ def deletarProduto():
 
     if result.deleted_count > 0:
         print("Produto deletado com sucesso!")
+        
+        # Excluir produto dos favoritos
+        query_filter = {'produto._id': produto_escolhido['_id']}
+        deleted_fav = colecao_favorito.delete_many(query_filter)
+
+        if deleted_fav.deleted_count > 0:
+            print("Favoritos removidos com sucesso!")
     else:
         print("Nenhuma alteração realizada. Verifique o ID.")
 

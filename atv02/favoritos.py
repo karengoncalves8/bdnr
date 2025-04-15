@@ -1,6 +1,6 @@
 from bson import ObjectId
 from db import conectar_mongo
-from vendedor import mostrarTodosVendedores
+
 from produto import mostrarTodosProdutos
 from usuario import mostrarTodosUsuarios
 
@@ -9,6 +9,22 @@ db = conectar_mongo()
 colecao_favorito = db.favorito
 colecao_produto = db.produto
 colecao_usuario = db.usuario
+
+def atualizarUsuarioFavoritos(favorito):
+    # Atualizar o favorito na lista de favoritos do usuário
+    query_filter_usuario = {'_id': ObjectId(favorito['usuario']['_id'])}
+
+    usuario_favoritos = list(colecao_favorito.find({'usuario._id': favorito['usuario']['_id']}))
+    novos_favoritos = [fav['produto'] for fav in usuario_favoritos]
+
+    update_operation_usuario = { '$set': {'favoritos':  novos_favoritos}}
+
+    result_usuario = colecao_usuario.update_one(query_filter_usuario, update_operation_usuario)
+
+    if result_usuario.modified_count > 0:
+        print(f"Lista de favoritos do usuário atualizada com sucesso!")
+    else:
+        print("Nenhuma alteração na lista de favoritos do usuário.")
 
 def mostrarTodosFavoritos():
     print("\nListagem de Favoritos")
@@ -20,6 +36,7 @@ def mostrarTodosFavoritos():
 def listarFavoritoDict(favorito_dict):
     for key in favorito_dict:
         if(key == "produto"): 
+            print('-- Informações do produto')
             for produto_key in favorito_dict["produto"]:
                 if(produto_key == "vendedor"): 
                     print(f"{key}: {favorito_dict[key][produto_key]["nome"]}")
@@ -27,8 +44,10 @@ def listarFavoritoDict(favorito_dict):
                 print(f'{produto_key}: {favorito_dict[key][produto_key]}')
             continue
         if(key == "usuario"): 
+            print('-- Informações do usuário')
             for usuario_key in favorito_dict["usuario"]:
-                print(f'{produto_key}: {favorito_dict[key][produto_key]}')
+                if(usuario_key == "favoritos"): break
+                print(f'{usuario_key}: {favorito_dict[key][usuario_key]}')
             continue
         print(f'{key}: {favorito_dict[key]}')
 
@@ -70,7 +89,7 @@ def criarFavorito():
     
     # Inserindo favorito ao usuário
     query_filter = {'_id': ObjectId(usuario_escolhido['_id'])}
-    update_operation = { '$push': {'favoritos': favorito} }
+    update_operation = { '$push': {'favoritos': favorito["produto"]} }
 
     result = colecao_usuario.update_one(query_filter, update_operation)
     if result.modified_count > 0:
@@ -134,16 +153,7 @@ def editarFavorito():
     else:
         print("Nenhuma alteração realizada. Verifique o ID ou os dados.")
 
-    # Atualizar o favorito na lista de favoritos do usuário
-    query_filter_usuario = {'_id': ObjectId(favorito_escolhido['usuario']['_id'])}
-    update_operation_usuario = { '$set': {'favoritos': list(colecao_favorito.find({'usuario._id': favorito_escolhido['usuario']['_id']}))} }
-
-    result_usuario = colecao_usuario.update_one(query_filter_usuario, update_operation_usuario)
-
-    if result_usuario.modified_count > 0:
-        print(f"Lista de favoritos do usuário atualizada com sucesso!")
-    else:
-        print("Nenhuma alteração na lista de favoritos do usuário.")
+    atualizarUsuarioFavoritos(favorito_escolhido)
 
 def deletarFavorito():
     print("\n======== Remover um Favorito ========")
@@ -165,6 +175,7 @@ def deletarFavorito():
 
     if result.deleted_count > 0:
         print("Favorito deletado com sucesso!")
+        atualizarUsuarioFavoritos(favorito_escolhido)
     else:
         print("Nenhuma alteração realizada. Verifique o ID.")
 
@@ -186,6 +197,7 @@ def listarFavorito():
 
     result = colecao_favorito.find_one(query_filter)
 
+    print("\n")
     listarFavoritoDict(result)
 
 

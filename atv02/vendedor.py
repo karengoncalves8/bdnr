@@ -4,6 +4,21 @@ from db import conectar_mongo
 db = conectar_mongo()
 
 colecao_vendedor = db.vendedor
+colecao_produto = db.produto
+
+def atualizarProduto(vendedor):
+    vendedor_att = colecao_vendedor.find_one({'_id': ObjectId(vendedor['_id'])})
+
+    # Atualizar informações do vendedor nos produtos pertencentes ao mesmo
+    query_filter_produto = {'vendedor._id': vendedor['_id']}
+    update_operation_usuario = { '$set': {'vendedor': vendedor_att}}
+
+    result = colecao_produto.update_many(query_filter_produto, update_operation_usuario)
+
+    if result.modified_count > 0:
+        print(f"Produtos do vendedor atualizado com sucesso!")
+    else:
+        print("Nenhuma alteração nos produtos do vendedor.")
 
 def mostrarTodosVendedores():
     print("\nListagem de vendedores")
@@ -84,18 +99,18 @@ def editarVendedor():
     cep = input("Cep: ")
 
     vendedor = {
-        "nome": nome,
-        "dataNascimento": dataNas,
-        "telefone": telefone,
-        "email": email,
-        "senha": senha,
-        "cnpj": cnpj,
+        "nome": nome if nome else vendedor_escolhido["nome"],
+        "dataNascimento": dataNas if dataNas else vendedor_escolhido["dataNascimento"],
+        "telefone": telefone if telefone else vendedor_escolhido["telefone"],
+        "email": email if email else vendedor_escolhido["email"],
+        "senha": senha if senha else vendedor_escolhido["senha"],
+        "cnpj": cnpj if cnpj else vendedor_escolhido["cnpj"],
         "endereco": {
-            "rua": rua,
-            "bairro": bairro,
-            "cidade": cidade,
-            "estado": estado,
-            "cep": cep
+            "rua": rua if rua else vendedor_escolhido["endereco"]["rua"],
+            "bairro": bairro if bairro else vendedor_escolhido["endereco"]["bairro"],
+            "cidade": cidade if cidade else vendedor_escolhido["endereco"]["cidade"],
+            "estado": estado if estado else vendedor_escolhido["endereco"]["estado"],
+            "cep": cep if cep else vendedor_escolhido["endereco"]["cep"]
         }
     }
 
@@ -105,6 +120,7 @@ def editarVendedor():
 
     if result.modified_count > 0:
         print("Vendedor atualizado com sucesso!")
+        atualizarProduto(vendedor_escolhido)
     else:
         print("Nenhuma alteração realizada. Verifique o ID ou os dados.")
 
@@ -128,6 +144,7 @@ def deletarVendedor():
 
     if result.deleted_count > 0:
         print("Vendedor deletado com sucesso!")
+        atualizarProduto(vendedor_escolhido)
     else:
         print("Nenhuma alteração realizada. Verifique o ID.")
 

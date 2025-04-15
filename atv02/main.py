@@ -2,6 +2,7 @@ from usuario import criarUsuario, deletarUsuario, editarUsuario, listarTodosUsua
 from vendedor import criarVendedor, deletarVendedor, editarVendedor, listarTodosVendedores, listarVendedor
 from produto import criarProduto, editarProduto, deletarProduto, listarProduto, listarTodosProdutos
 from compra import criarCompra, editarCompra, deletarCompra, listarCompra, listarTodasCompras
+from favoritos import criarFavorito, editarFavorito, deletarFavorito, listarFavorito, listarTodosFavoritos
 
 print('-------- Gerenciamento do MongoDB -----------')
 
@@ -86,8 +87,18 @@ while True:
                 case 5:
                     listarTodasCompras()
         case 5:
-            print('hi')
-            
+            acao = menuAcoes()
+            match acao:
+                case 1:
+                    criarFavorito()
+                case 2:
+                    editarFavorito()
+                case 3:
+                    deletarFavorito()
+                case 4:
+                    listarFavorito()
+                case 5:
+                    listarTodosFavoritos()
         case 0:
             break
         case _:
