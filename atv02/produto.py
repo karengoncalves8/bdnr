@@ -8,21 +8,6 @@ colecao_produto = db.produto
 colecao_vendedor = db.vendedor
 colecao_favorito = db.favoritos
 
-def atualizarFavorito(produto):
-    print("o produto escolhido", produto)
-    produto_att = colecao_produto.find_one({'_id': ObjectId(produto['_id'])})
-
-    # Atualizar informações do produto na lista de favoritos
-    query_filter = {'produto._id': produto['_id']}
-    update_operation = { '$set': {'produto': produto_att}}
-
-    result = colecao_favorito.update_many(query_filter, update_operation)
-
-    if result.modified_count > 0:
-        print(f"Produto atualizado na lista de favoritos com sucesso!")
-    else:
-        print("Nenhuma alteração nos produtos dos favoritos.")
-
 def mostrarTodosProdutos():
     print("\nListagem de Produtos")
     produtos = list(colecao_produto.find({}))
