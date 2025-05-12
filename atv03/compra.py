@@ -169,35 +169,13 @@ def editarCompra():
         "usuario": usuario_escolhido
     }
     
-    print("compra antets", compra)
-    
     compra_serializada = convert_objectid_to_str(compra)
     compra_serializada = json.dumps(compra_serializada)
     
-    redis.set(str(compra_escolhida['_id']), compra_serializada)
-    
-    compra_atualizada = redis.get(str(compra_escolhida['_id']))
-    
-    compra = json.loads(compra_atualizada)  
-
-    compra_com_objectids = convert_str_to_objectid(compra)
-    compra_com_objectids = remove_bin_data_fields(compra_com_objectids)
-    
-    print("compra com obj", compra_com_objectids)
-
-    colecao_compra.update_one(
-        {"_id": ObjectId(compra_escolhida['_id'])},
-        {"$set": compra}
-    )
-
-    query_filter = {'_id': compra_escolhida['_id']}
-    update_operation = {'$set': compra_atualizada}
-
-    result = colecao_compra.update_one(query_filter, update_operation)
-
-    if result.modified_count > 0:
+    try:
+        redis.set(str(compra_escolhida['_id']), compra_serializada)
         print(f"Compra atualizada com sucesso!")
-    else:
+    except:
         print("Nenhuma alteração realizada. Verifique o ID ou os dados.")
     
 
@@ -210,19 +188,16 @@ def deletarCompra():
 
     compras = list(colecao_compra.find({}))
     try:
-        compras_escolhida = compras[opcao]
+        compra_escolhida = compras[opcao]
     except IndexError:
         print("Índice não encontrado! Por favor, escolha um índice válido.")
         return
-
-    query_filter = {'_id': compras_escolhida['_id']}
-
-    result = colecao_compra.delete_one(query_filter)
-
-    if result.deleted_count > 0:
+    
+    try:
+        redis.set(str(compra_escolhida['_id']), 'deleted')
         print("Compra deletada com sucesso!")
-    else:
-        print("Nenhuma alteração realizada. Verifique o ID.")
+    except:
+        print("Nenhuma alteração realizada. Verifique o ID ou os dados.")
 
 def listarCompra():
     print("\n======== Listar uma compra ========")

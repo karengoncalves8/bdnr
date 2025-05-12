@@ -3,6 +3,7 @@ from vendedor import criarVendedor, deletarVendedor, editarVendedor, listarTodos
 from produto import criarProduto, editarProduto, deletarProduto, listarProduto, listarTodosProdutos
 from compra import criarCompra, editarCompra, deletarCompra, listarCompra, listarTodasCompras
 from favoritos import criarFavorito, editarFavorito, deletarFavorito, listarFavorito, listarTodosFavoritos
+from sincBDs import sinc_bds
 
 print('-------- Gerenciamento do MongoDB -----------')
 
@@ -100,6 +101,9 @@ while True:
                     listarFavorito()
                 case 5:
                     listarTodosFavoritos()
+        case 6:
+            print("\n======== Atualizando MongoDB com Redis ========")
+            sinc_bds()
         case 0:
             break
         case _:
