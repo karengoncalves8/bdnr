@@ -117,7 +117,7 @@ def editarProduto():
         "vendedor": vendedor_escolhido
     }
     
-    redis.set(produto_escolhido['_id'], json.dumps(produto))
+    redis.set(produto_escolhido['_id'], produto)
     
     produto_atualizado = redis.get(produto_escolhido['_id'])
 

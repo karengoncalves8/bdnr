@@ -23,8 +23,12 @@ def sinc_bds():
                 return
             
             value = redis.get(key_str)  
-            
+        
             print("value", value)
+            
+            if isinstance(value, bytes):
+                print("decodigicando")
+                value = value.decode('utf-8') 
             
             if value == 'deleted': 
                 print("deleting")
@@ -35,7 +39,7 @@ def sinc_bds():
                 else:
                     print("Nenhuma alteração realizada. Verifique o ID.")
             else:
-                compra_atualizada = json.loads(value.decode('utf-8'))
+                compra_atualizada = json.loads(value)
 
                 compra_com_objectids = convert_str_to_objectid(compra_atualizada)
                 update_operation = {'$set': compra_com_objectids}
