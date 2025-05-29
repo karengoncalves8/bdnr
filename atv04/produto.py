@@ -1,0 +1,92 @@
+from bson import ObjectId
+from db import conectar_mongo
+from vendedor import mostrarTodosVendedores
+
+db = conectar_mongo()
+
+colecao_produto = db.produto
+colecao_vendedor = db.vendedor
+colecao_favorito = db.favoritos
+
+def mostrarTodosProdutos():
+    print("\nListagem de Produtos")
+    produtos = list(colecao_produto.find({}))
+
+    for index, produto in enumerate(produtos):
+        print(f'{index} - {produto["nome"]}')  
+
+def listarProdutoDict(produto_dict):
+    for key in produto_dict:
+        if key == "vendedor": 
+            print("-- Informações do vendedor: ")
+            for vendedor_key in produto_dict["vendedor"]:
+                if vendedor_key == "endereco": 
+                    print(f"{vendedor_key}: {produto_dict['vendedor'][vendedor_key]['rua']}, {produto_dict['vendedor'][vendedor_key]['bairro']}, {produto_dict['vendedor'][vendedor_key]['cidade']}, {produto_dict['vendedor'][vendedor_key]['estado']}, {produto_dict['vendedor'][vendedor_key]['cep']}")  # Correção aqui
+                    continue
+                print(f'{vendedor_key}: {produto_dict["vendedor"][vendedor_key]}')  
+            continue
+        print(f'{key}: {produto_dict[key]}')
+
+def criarProduto():
+    print("\n======== Inserindo um novo produto ========")
+
+    nome = input("Nome: ")
+    preco = float(input("Preço: "))
+    quantidade = int(input("Quantidade: "))
+    marca = input("Marca: ")
+    material = input("Material: ")
+    descricao = input("Descrição: ")
+
+    print("Associe a um vendedor: ")
+
+    mostrarTodosVendedores()
+
+    opcao_vendedor = int(input("Index da opção escolhida: "))
+    vendedores = list(colecao_vendedor.find({}))
+
+    try:
+        vendedor_escolhido = vendedores[opcao_vendedor]
+    except IndexError:
+        print("Índice não encontrado! Por favor, escolha um índice válido.")
+        return
+
+    produto = {
+        "nome": nome,
+        "preco": preco,
+        "quantidade": quantidade,
+        "marca": marca,
+        "material": material,
+        "descricao": descricao,
+        "vendedor": vendedor_escolhido
+    }
+
+    doc = colecao_produto.insert_one(produto)
+    print("Documento inserido com ID ", doc.inserted_id)
+
+def listarProduto():
+    print("\n======== Listar um produto ========")
+
+    mostrarTodosProdutos()
+
+    opcao = int(input("Index da opção escolhida: "))
+
+    produtos = list(colecao_produto.find({}))
+    try:
+        produto_escolhido = produtos[opcao]
+    except IndexError:
+        print("Índice não encontrado! Por favor, escolha um índice válido.")
+        return
+
+    query_filter = {'_id': ObjectId(produto_escolhido['_id'])}
+
+    result = colecao_produto.find_one(query_filter)
+
+    listarProdutoDict(result)
+
+def listarTodosProdutos():
+    print("\n======== Listar todos produtos ========")
+    produtos = list(colecao_produto.find({}))
+    
+    for produto in produtos:
+        print("------------------------------------------------------")
+        listarProdutoDict(produto)
