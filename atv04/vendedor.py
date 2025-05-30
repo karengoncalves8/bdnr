@@ -1,24 +1,7 @@
-from bson import ObjectId
-from db import conectar_mongo
+from db import conectar_cassandra
+import uuid
 
-db = conectar_mongo()
-
-colecao_vendedor = db.vendedor
-colecao_produto = db.produto
-
-def atualizarProduto(vendedor):
-    vendedor_att = colecao_vendedor.find_one({'_id': ObjectId(vendedor['_id'])})
-
-    # Atualizar informações do vendedor nos produtos pertencentes ao mesmo
-    query_filter_produto = {'vendedor._id': vendedor['_id']}
-    update_operation_usuario = { '$set': {'vendedor': vendedor_att}}
-
-    result = colecao_produto.update_many(query_filter_produto, update_operation_usuario)
-
-    if result.modified_count > 0:
-        print(f"Produtos do vendedor atualizado com sucesso!")
-    else:
-        print("Nenhuma alteração nos produtos do vendedor.")
+session = conectar_cassandra()
 
 def criarVendedor():
     print("\n======== Inserindo um novo vendedor ========")
@@ -36,21 +19,30 @@ def criarVendedor():
     estado = input("Estado: ")
     cep = input("Cep: ")
 
-    vendedor = {
-        "nome": nome,
-        "dataNascimento": dataNas,
-        "telefone": telefone,
-        "email": email,
-        "senha": senha,
-        "cnpj": cnpj,
-        "endereco": {
-            "rua": rua,
-            "bairro": bairro,
-            "cidade": cidade,
-            "estado": estado,
-            "cep": cep
-        }
-    }
+    user_id = uuid.uuid4()
 
-    doc = colecao_vendedor.insert_one(vendedor)
-    print("Documento inserido com ID ",doc.inserted_id)
+    session.execute("""
+        INSERT INTO vendedor (id, nome, dataNascimento, telefone, email, senha, cnpj, rua, bairro, cidade, estado, cep)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """, (user_id, nome, dataNas, telefone, email, senha, cnpj, rua, bairro, cidade, estado, cep))
+
+    print(f"Vendedor criado com sucesso! ID: {user_id}")
+
+def listarVendedores():
+    rows = session.execute("SELECT * FROM vendedor")
+
+    for row in rows:
+        print("ID:", row.id)
+        print("Nome:", row.nome)
+        print("Data de Nascimento:", row.datanascimento)
+        print("Telefone:", row.telefone)
+        print("Email:", row.email)
+        print("Senha:", row.senha)
+        print("CNPJ:", row.cnpj)
+        print("Rua:", row.rua)
+        print("Bairro:", row.bairro)
+        print("Cidade:", row.cidade)
+        print("Estado:", row.estado)
+        print("CEP:", row.cep)
+
+        print("-" * 40)

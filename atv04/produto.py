@@ -10,7 +10,7 @@ colecao_favorito = db.favoritos
 
 def mostrarTodosProdutos():
     print("\nListagem de Produtos")
-    produtos = list(colecao_produto.find({}))
+    produtos = list(colecao_produto.find({}))                                           
 
     for index, produto in enumerate(produtos):
         print(f'{index} - {produto["nome"]}')  

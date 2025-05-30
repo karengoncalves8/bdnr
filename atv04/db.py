@@ -29,4 +29,21 @@ def conectar_cassandra():
         )
     """)
 
+    session.execute("""
+        CREATE TABLE IF NOT EXISTS vendedor (
+            id uuid PRIMARY KEY,
+            nome text,
+            dataNascimento text,
+            telefone text,
+            email text,
+            senha text,
+            cnpj text,
+            rua text,
+            bairro text,
+            cidade text,
+            estado text,
+            cep text
+        )
+    """)
+
     return session

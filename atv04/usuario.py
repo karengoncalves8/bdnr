@@ -10,10 +10,6 @@ def mostrarTodosUsuarios():
     for index, usuario in enumerate(usuarios):
         print(f'{index} - {usuario.nome}')
 
-def listarUsuarioDict(usuario_dict):
-    for key in usuario_dict:
-        print(f'{key}: {usuario_dict[key]}')
-
 def criarUsuario():
     print("\n======== Inserindo um novo usuário ========")
 
@@ -69,3 +65,22 @@ def editarUsuario():
     """, (nome, dataNas, telefone, email, senha, rua, bairro, cidade, estado, cep, usuario_escolhido.id))
 
     print("Usuário atualizado com sucesso!")
+
+def listarUsuarios():
+    rows = session.execute("SELECT * FROM usuario")
+
+    for row in rows:
+        print("-" * 40)
+        print("ID:", row.id)
+        print("Nome:", row.nome)
+        print("Data de Nascimento:", row.datanascimento)
+        print("Telefone:", row.telefone)
+        print("Email:", row.email)
+        print("Senha:", row.senha)
+        print("  Rua:", row.rua)
+        print("  Bairro:", row.bairro)
+        print("  Cidade:", row.cidade)
+        print("  Estado:", row.estado)
+        print("  CEP:", row.cep)
+
+        print("-" * 40)

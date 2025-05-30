@@ -1,5 +1,5 @@
-from usuario import criarUsuario, editarUsuario
-# from vendedor import criarVendedor
+from usuario import criarUsuario, editarUsuario, listarUsuarios
+from vendedor import criarVendedor, listarVendedores
 # from produto import criarProduto, listarProduto, listarTodosProdutos
 # from compra import criarCompra, deletarCompra
 
@@ -37,10 +37,14 @@ while True:
             criarUsuario()
         elif acao == 2:
             editarUsuario()
-    # elif escolha == 2:
-    #     acao = menuAcoes()
-    #     if acao == 1:
-    #         criarVendedor()
+        elif acao == 5:
+            listarUsuarios()
+    elif escolha == 2:
+        acao = menuAcoes()
+        if acao == 1:
+            criarVendedor()
+        elif acao == 5:
+            listarVendedores()
     # elif escolha == 3:
     #     acao = menuAcoes()
     #     if acao == 1:
