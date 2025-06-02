@@ -1,31 +1,23 @@
-from bson import ObjectId
-from db import conectar_mongo
-from vendedor import mostrarTodosVendedores
+import uuid
+from db import Vendedor, conectar_cassandra
 
-db = conectar_mongo()
-
-colecao_produto = db.produto
-colecao_vendedor = db.vendedor
-colecao_favorito = db.favoritos
+session = conectar_cassandra()
 
 def mostrarTodosProdutos():
     print("\nListagem de Produtos")
-    produtos = list(colecao_produto.find({}))                                           
+    rows = session.execute("SELECT id, nome FROM produto")
+    for index, row in enumerate(rows):
+        print(f"{index} - {row.nome}")
 
-    for index, produto in enumerate(produtos):
-        print(f'{index} - {produto["nome"]}')  
-
-def listarProdutoDict(produto_dict):
-    for key in produto_dict:
-        if key == "vendedor": 
-            print("-- Informações do vendedor: ")
-            for vendedor_key in produto_dict["vendedor"]:
-                if vendedor_key == "endereco": 
-                    print(f"{vendedor_key}: {produto_dict['vendedor'][vendedor_key]['rua']}, {produto_dict['vendedor'][vendedor_key]['bairro']}, {produto_dict['vendedor'][vendedor_key]['cidade']}, {produto_dict['vendedor'][vendedor_key]['estado']}, {produto_dict['vendedor'][vendedor_key]['cep']}")  # Correção aqui
-                    continue
-                print(f'{vendedor_key}: {produto_dict["vendedor"][vendedor_key]}')  
+def listarProdutoDict(produto):
+    for key, value in produto._asdict().items():
+        if key == "vendedor":
+            print("-- Informações do vendedor:")
+            vendedor = value
+            for vend_key, vend_val in vendedor.items():
+                print(f"{vend_key}: {vend_val}")
             continue
-        print(f'{key}: {produto_dict[key]}')
+        print(f"{key}: {value}")
 
 def criarProduto():
     print("\n======== Inserindo um novo produto ========")
@@ -38,54 +30,58 @@ def criarProduto():
     descricao = input("Descrição: ")
 
     print("Associe a um vendedor: ")
-
-    mostrarTodosVendedores()
+    vendedores = list(session.execute("SELECT * FROM vendedor"))
+    for idx, v in enumerate(vendedores):
+        print(f"{idx} - {v.nome}")
 
     opcao_vendedor = int(input("Index da opção escolhida: "))
-    vendedores = list(colecao_vendedor.find({}))
-
     try:
         vendedor_escolhido = vendedores[opcao_vendedor]
     except IndexError:
-        print("Índice não encontrado! Por favor, escolha um índice válido.")
+        print("Índice inválido!")
         return
 
-    produto = {
-        "nome": nome,
-        "preco": preco,
-        "quantidade": quantidade,
-        "marca": marca,
-        "material": material,
-        "descricao": descricao,
-        "vendedor": vendedor_escolhido
-    }
+    produto_id = uuid.uuid4()
+    
+    vendedor_obj = Vendedor(
+        id=vendedor_escolhido.id,
+        nome=vendedor_escolhido.nome,
+        dataNascimento=vendedor_escolhido.datanascimento,
+        telefone=vendedor_escolhido.telefone,
+        email=vendedor_escolhido.email,
+        senha=vendedor_escolhido.senha,
+        cnpj=vendedor_escolhido.cnpj,
+        rua=vendedor_escolhido.rua,
+        bairro=vendedor_escolhido.bairro,
+        cidade=vendedor_escolhido.cidade,
+        estado=vendedor_escolhido.estado,
+        cep=vendedor_escolhido.cep
+    )
+    session.execute("""
+        INSERT INTO produto (id, nome, preco, quantidade, marca, material, descricao, vendedor)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """, (produto_id, nome, preco, quantidade, marca, material, descricao, vendedor_obj))
 
-    doc = colecao_produto.insert_one(produto)
-    print("Documento inserido com ID ", doc.inserted_id)
+    print(f"Produto criado com sucesso! ID: {produto_id}")
 
 def listarProduto():
     print("\n======== Listar um produto ========")
 
     mostrarTodosProdutos()
-
     opcao = int(input("Index da opção escolhida: "))
 
-    produtos = list(colecao_produto.find({}))
+    produtos = list(session.execute("SELECT * FROM produto"))
     try:
         produto_escolhido = produtos[opcao]
     except IndexError:
-        print("Índice não encontrado! Por favor, escolha um índice válido.")
+        print("Índice inválido!")
         return
 
-    query_filter = {'_id': ObjectId(produto_escolhido['_id'])}
-
-    result = colecao_produto.find_one(query_filter)
-
-    listarProdutoDict(result)
+    listarProdutoDict(produto_escolhido)
 
 def listarTodosProdutos():
     print("\n======== Listar todos produtos ========")
-    produtos = list(colecao_produto.find({}))
+    produtos = session.execute("SELECT * FROM produto")
     
     for produto in produtos:
         print("------------------------------------------------------")
