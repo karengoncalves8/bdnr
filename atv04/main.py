@@ -3,7 +3,7 @@ from vendedor import criarVendedor, listarVendedores
 from produto import criarProduto, listarProduto, listarTodosProdutos
 from compra import criarCompra, deletarCompra, listarTodasCompras
 
-print('-------- Gerenciamento do MongoDB -----------')
+print('-------- Gerenciamento do Cassandra -----------')
 
 def menuAcoes():
     print('\nO que deseja fazer?')

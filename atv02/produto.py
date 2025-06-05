@@ -13,7 +13,7 @@ def mostrarTodosProdutos():
     produtos = list(colecao_produto.find({}))
 
     for index, produto in enumerate(produtos):
-        print(f'{index} - {produto['nome']}')
+        print(f"{index} - {produto['nome']}")
 
 def listarProdutoDict(produto_dict):
     for key in produto_dict:
@@ -21,7 +21,7 @@ def listarProdutoDict(produto_dict):
             print("-- Informações do vendedor: ")
             for vendedor_key in produto_dict["vendedor"]:
                 if(vendedor_key == "endereco"): 
-                    print(f"{vendedor_key}: {produto_dict["vendedor"][vendedor_key]["rua"]}, {produto_dict["vendedor"][vendedor_key]["bairro"]}, {produto_dict["vendedor"][vendedor_key]["cidade"]}, {produto_dict["vendedor"][vendedor_key]["estado"]}, {produto_dict["vendedor"][vendedor_key]["cep"]}")
+                    print(f'{vendedor_key}: {produto_dict["vendedor"][vendedor_key]["rua"]}, {produto_dict["vendedor"][vendedor_key]["bairro"]}, {produto_dict["vendedor"][vendedor_key]["cidade"]}, {produto_dict["vendedor"][vendedor_key]["estado"]}, {produto_dict["vendedor"][vendedor_key]["cep"]}')
                     continue
                 print(f'{vendedor_key}: {produto_dict["vendedor"][vendedor_key]}')
             continue
@@ -119,7 +119,6 @@ def editarProduto():
 
     if result.modified_count > 0:
         print("Produto atualizado com sucesso!")
-        atualizarFavorito(produto_escolhido)
     else:
         print("Nenhuma alteração realizada. Verifique o ID ou os dados.")
 

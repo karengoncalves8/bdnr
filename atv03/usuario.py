@@ -9,12 +9,12 @@ def mostrarTodosUsuarios():
     usuarios = list(colecao_usuario.find({}))
 
     for index, usuario in enumerate(usuarios):
-        print(f'{index} - {usuario['nome']}')
+        print(f"{index} - {usuario['nome']}")
 
 def listarUsuarioDict(usuario_dict):
     for key in usuario_dict:
         if(key == "endereco"): 
-            print(f"{key}: {usuario_dict[key]["rua"]}, {usuario_dict[key]["bairro"]}, {usuario_dict[key]["cidade"]}, {usuario_dict[key]["estado"]}, {usuario_dict[key]["cep"]}")
+            print(f'{key}: {usuario_dict[key]["rua"]}, {usuario_dict[key]["bairro"]}, {usuario_dict[key]["cidade"]}, {usuario_dict[key]["estado"]}, {usuario_dict[key]["cep"]}')
             continue
         print(f'{key}: {usuario_dict[key]}')
 

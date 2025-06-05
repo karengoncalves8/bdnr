@@ -24,12 +24,12 @@ def mostrarTodosVendedores():
     vendedores = list(colecao_vendedor.find({}))
 
     for index, vendedor in enumerate(vendedores):
-        print(f'{index} - {vendedor['nome']}')
+        print(f"{index} - {vendedor['nome']}")
 
 def listarVendedorDict(vendedor_dict):
     for key in vendedor_dict:
         if(key == "endereco"): 
-            print(f"{key}: {vendedor_dict[key]["rua"]}, {vendedor_dict[key]["bairro"]}, {vendedor_dict[key]["cidade"]}, {vendedor_dict[key]["estado"]}, {vendedor_dict[key]["cep"]}")
+            print(f'{key}: {vendedor_dict[key]["rua"]}, {vendedor_dict[key]["bairro"]}, {vendedor_dict[key]["cidade"]}, {vendedor_dict[key]["estado"]}, {vendedor_dict[key]["cep"]}')
             continue
         print(f'{key}: {vendedor_dict[key]}')
 

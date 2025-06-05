@@ -30,7 +30,7 @@ def mostrarTodosFavoritos():
     favoritos = list(colecao_favorito.find({}))
 
     for index, favorito in enumerate(favoritos):
-        print(f'{index} - {favorito['produto']['nome']} de {favorito['usuario']['nome']}')
+        print(f"{index} - {favorito['produto']['nome']} de {favorito['usuario']['nome']}")
 
 def listarFavoritoDict(favorito_dict):
     for key in favorito_dict:
@@ -38,7 +38,7 @@ def listarFavoritoDict(favorito_dict):
             print('-- Informações do produto')
             for produto_key in favorito_dict["produto"]:
                 if(produto_key == "vendedor"): 
-                    print(f"{key}: {favorito_dict[key][produto_key]["nome"]}")
+                    print(f'{key}: {favorito_dict[key][produto_key]["nome"]}')
                     continue
                 print(f'{produto_key}: {favorito_dict[key][produto_key]}')
             continue

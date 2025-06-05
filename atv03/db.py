@@ -1,3 +1,4 @@
+import time
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import redis
@@ -11,5 +12,18 @@ def conectar_mongo():
     return db
 
 def conectar_redis():
-    client = redis.Redis(host='redis-18720.c308.sa-east-1-1.ec2.redns.redis-cloud.com', port=18720, password='2xJNxR9w0qUVEOCxNZygsSSMBq3w1rWi')
-    return client
+    while True:
+        try:
+            cliente_redis = redis.StrictRedis(
+                host='redis-14368.c14.us-east-1-2.ec2.redns.redis-cloud.com',
+                port=14368,
+                password='Y3uUgk7lzkQbf7onGmrWiSFkZQWQZ8Jl',
+                db=0,
+                socket_timeout=5  
+            )
+            cliente_redis.ping()  
+            print("Conectado ao Redis com sucesso!")
+            return cliente_redis 
+        except redis.ConnectionError as e:
+            print(f"Erro ao conectar ao Redis: {e}. Tentando novamente em 5 segundos...")
+            time.sleep(5)  

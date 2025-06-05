@@ -139,6 +139,7 @@ def inicio():
     while execucao:
         print(''' O que deseja fazer?
     1 - Login
+    2 - Cadastro
     0 - Encerrar aplicação 
         ''')
         
@@ -159,6 +160,8 @@ def inicio():
                     execucao = False
                     
                     main()
+            case 2:
+                criarUsuario()
             case 0:
                 print("Encerrando....")
                 execucao = False

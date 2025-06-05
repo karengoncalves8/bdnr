@@ -23,15 +23,11 @@ def sinc_bds():
                 return
             
             value = redis.get(key_str)  
-        
-            print("value", value)
             
             if isinstance(value, bytes):
-                print("decodigicando")
                 value = value.decode('utf-8') 
             
             if value == 'deleted': 
-                print("deleting")
                 result = colecao_compra.delete_one(query_filter)
 
                 if result.deleted_count > 0:

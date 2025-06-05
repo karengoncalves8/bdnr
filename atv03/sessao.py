@@ -13,13 +13,13 @@ def login(email, password):
         registro = colecao_usuario.find_one({"email": email})
         
         if registro["senha"] == password:
-            redis.setex(email, 60, registro["nome"])
+            redis.setex(email, 90, registro["nome"])
             return True
         else:
             print("Usuário não encontrado. Senha ou Email incorreta.")
             return False
-    except:
-        print("Usuário não encontrado. Senha ou Email incorreta.")
+    except Exception as e:
+        print("Ocorreu um erro: ", e)
         return False
     
 def verificarUsuarios():

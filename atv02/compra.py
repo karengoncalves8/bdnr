@@ -16,7 +16,7 @@ def mostrarTodasCompras():
     compras = list(colecao_compra.find({}))
 
     for index, compra in enumerate(compras):
-        print(f'{index} - {compra['usuario']['nome']} - {compra['data']}: R${compra['valor']}')
+        print(f"{index} - {compra['usuario']['nome']} - {compra['data']}: R${compra['valor']}")
 
 def listarCompraDict(compra_dict):
     for key in compra_dict:
@@ -26,7 +26,7 @@ def listarCompraDict(compra_dict):
                 print(f"> {item_compra['produto']['nome']} | Quantidade: {item_compra['quantidade']} | Subtotal: {item_compra['subtotal']}")
             continue
         if(key == "usuario"):
-            print(f'{key}: {compra_dict[key]['nome']}')
+            print(f"{key}: {compra_dict[key]['nome']}")
             continue
         print(f'{key}: {compra_dict[key]}')
 
